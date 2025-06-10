@@ -4,11 +4,16 @@ resource "aws_iam_role" "github_actions_role" {
   assume_role_policy = jsondecode({
     Version = "2012-10-17"
     Statement = [{
-      Action = "sts:AssumeRole"
+      Action = "sts:AssumeRoleWithWebIdentity"
       Effect = "Allow"
-      Sid    = ""
       Principal = {
-        Service = "ec2.amazonaws.com"
+        "Federated": "arn:aws:iam::049886442714:oidc-provider/token.actions.githubusercontent.com"
+      }
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+          "token.actions.githubusercontent.com:sub": "repo:ArtyomKr/rsschool-devops-course-tasks:ref:refs/heads/main"
+        }
       }
     }]
   })
