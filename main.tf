@@ -2,10 +2,10 @@ variable "region" { default = "eu-central-1" }
 
 terraform {
   backend "s3" {
-    bucket = "artyomkr-terraform-state"
-    key    = "rsschool/state"
-    region = "eu-central-1"
-    encrypt = "true"
+    bucket       = "artyomkr-terraform-state"
+    key          = "rsschool/state"
+    region       = "eu-central-1"
+    encrypt      = "true"
     use_lockfile = "true"
   }
 
