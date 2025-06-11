@@ -1,7 +1,9 @@
 name: Terraform
 on:
-  [push, pull_request]:
-    branches: [main]
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   terraform-check:
@@ -14,7 +16,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform fmt
-        run: terraform fmt -check -recursive
+        run: terraform fmt -check -recursive -no-color
 
   terraform-plan:
     needs: terraform-check
@@ -36,7 +38,7 @@ jobs:
           aws-region: eu-central-1
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init -input=false
 
       - name: Terraform Plan
         run: terraform plan -no-color -input=false
