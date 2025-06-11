@@ -11,7 +11,7 @@ variable "aws_account_id" {
 }
 
 variable "git_actions_policies" {
-  type        = list(string)
+  type = list(string)
   default = [
     "arn:aws:iam::aws:policy/AmazonEC2FullAccess",
     "arn:aws:iam::aws:policy/AmazonRoute53FullAccess",
