@@ -1,5 +1,3 @@
-variable "region" { default = "eu-central-1" }
-
 terraform {
   backend "s3" {
     bucket       = "artyomkr-terraform-state"
