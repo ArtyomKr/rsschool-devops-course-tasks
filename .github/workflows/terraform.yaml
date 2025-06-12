@@ -16,6 +16,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform fmt
+        working-directory: ./terraform
         run: terraform fmt -check -recursive -no-color
 
   terraform-plan:
@@ -38,9 +39,11 @@ jobs:
           aws-region: eu-central-1
 
       - name: Terraform Init
+        working-directory: ./terraform
         run: terraform init -input=false
 
       - name: Terraform Plan
+        working-directory: ./terraform
         run: terraform plan -no-color -input=false
 
   terraform-apply:
@@ -63,7 +66,9 @@ jobs:
            aws-region: eu-central-1
 
       - name: Terraform Init
+        working-directory: ./terraform
         run: terraform init -input=false
 
       - name: Terraform Apply
+        working-directory: ./terraform
         run: terraform apply -no-color -input=false
