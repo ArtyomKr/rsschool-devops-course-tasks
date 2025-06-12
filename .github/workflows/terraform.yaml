@@ -42,3 +42,28 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -no-color -input=false
+
+  terraform-apply:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+           role-to-assume: arn:aws:iam::049886442714:role/GithubActionsRole
+           aws-region: eu-central-1
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        run: terraform apply -no-color -input=false
