@@ -4,6 +4,6 @@ variable "access_ip" {
 }
 
 variable "ec2_iam" {
-  type = string
+  type    = string
   default = "ami-092ff8e60e2d51e19"
 }

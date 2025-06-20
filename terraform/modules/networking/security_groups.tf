@@ -39,7 +39,7 @@ resource "aws_security_group" "bastion" {
 }
 
 resource "aws_network_acl" "private" {
-  vpc_id      = aws_vpc.main.id
+  vpc_id     = aws_vpc.main.id
   subnet_ids = [aws_subnet.private_1a.id, aws_subnet.private_1b.id]
 
   egress {
