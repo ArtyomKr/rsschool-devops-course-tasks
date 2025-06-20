@@ -1,14 +1,15 @@
 resource "aws_instance" "nat" {
-  ami           = "ami-092ff8e60e2d51e19"
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.public_1a.id
+  ami                         = var.ec2_iam
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public_1a.id
   associate_public_ip_address = true
-  source_dest_check = false
+  source_dest_check           = false
+  vpc_security_group_ids      = [aws_security_group.nat.id]
 
   user_data = <<-EOF
     #!/bin/bash
     sudo sysctl -w net.ipv4.ip_forward=1
-    sudo iptables -t nat -A POSTROUTING -o ens5 -s 0.0.0.0/0 -j MASQUERADE
+    sudo iptables -t nat -A POSTROUTING -o eth0 -s 0.0.0.0/0 -j MASQUERADE
   EOF
 
   tags = {
