@@ -43,17 +43,21 @@ resource "aws_network_acl" "private" {
   subnet_ids = [aws_subnet.private_1a.id, aws_subnet.private_1b.id]
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    cidr_block = "0.0.0.0/0"
+    action     = "allow"
+    rule_no    = 100
   }
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = [aws_vpc.main.cidr_block]
+    from_port  = 0
+    to_port    = 0
+    protocol   = "-1"
+    cidr_block = aws_vpc.main.cidr_block
+    action     = "allow"
+    rule_no    = 100
   }
 
   tags = {
