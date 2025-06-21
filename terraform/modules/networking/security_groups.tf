@@ -38,29 +38,56 @@ resource "aws_security_group" "bastion" {
   }
 }
 
-resource "aws_network_acl" "private" {
-  vpc_id     = aws_vpc.main.id
-  subnet_ids = [aws_subnet.private_1a.id, aws_subnet.private_1b.id]
+resource "aws_security_group" "private" {
+  name        = "private-instance-sg"
+  description = "Allow SSH from bastion"
+  vpc_id      = aws_vpc.main.id
 
   egress {
-    from_port  = 0
-    to_port    = 0
-    protocol   = "-1"
-    cidr_block = "0.0.0.0/0"
-    action     = "allow"
-    rule_no    = 100
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    from_port  = 0
-    to_port    = 0
-    protocol   = "-1"
-    cidr_block = aws_vpc.main.cidr_block
-    action     = "allow"
-    rule_no    = 100
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
+  }
+}
+
+resource "aws_security_group" "public" {
+  name        = "web-server-sg"
+  description = "Allow HTTP/HTTPS traffic"
+  vpc_id      = aws_vpc.main.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "Private-Instance-SG"
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion.id]
   }
 }
