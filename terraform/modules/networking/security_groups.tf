@@ -40,7 +40,7 @@ resource "aws_security_group" "bastion" {
 
 resource "aws_security_group" "private" {
   name        = "private-instance-sg"
-  description = "Allow SSH from bastion"
+  description = "Allow internal traffic"
   vpc_id      = aws_vpc.main.id
 
   egress {
