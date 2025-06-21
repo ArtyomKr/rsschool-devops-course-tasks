@@ -71,4 +71,4 @@ jobs:
 
       - name: Terraform Apply
         working-directory: ./terraform
-        run: terraform apply -no-color -input=false
+        run: terraform apply -no-color -input=false -auto-approve
