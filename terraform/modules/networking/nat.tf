@@ -13,11 +13,10 @@ resource "aws_instance" "nat" {
   EOF
 
   tags = {
-    Name = "NAT-Instance"
+    Name = "NAT Instance"
   }
 }
 
 resource "aws_eip" "nat" {
   instance = aws_instance.nat.id
-  # domain   = "vpc"
 }

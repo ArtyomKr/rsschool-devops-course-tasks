@@ -6,6 +6,6 @@ resource "aws_instance" "bastion" {
   vpc_security_group_ids      = [aws_security_group.bastion.id]
 
   tags = {
-    Name = "Bastion-Host"
+    Name = "Bastion Host"
   }
 }
