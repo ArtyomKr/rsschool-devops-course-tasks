@@ -8,8 +8,11 @@ resource "aws_instance" "nat" {
 
   user_data = <<-EOF
     #!/bin/bash
-    sudo sysctl -w net.ipv4.ip_forward=1
-    sudo iptables -t nat -A POSTROUTING -o eth0 -s 0.0.0.0/0 -j MASQUERADE
+    yum update -y
+    yum install -y iptables iproute
+    echo "net.ipv4.ip_forward = 1" | tee -a /etc/sysctl.conf
+    sysctl -p
+    iptables -t nat -A POSTROUTING -o ens5 -s 0.0.0.0/0 -j MASQUERADE
   EOF
 
   tags = {
