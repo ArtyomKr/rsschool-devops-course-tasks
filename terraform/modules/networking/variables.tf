@@ -1,15 +1,21 @@
-variable "access_ip" {
-  type    = string
-  default = "0.0.0.0/0"
+variable "allowed_access_ips" {
+  type = list(string)
 }
 
 variable "ec2_iam" {
-  type    = string
-  default = "ami-092ff8e60e2d51e19"
+  type = string
 }
 
 variable "key_pair_name" {
   type    = string
   default = "Private-key-tyoma"
+}
+
+variable "aws_region" {
+  type = string
+}
+
+variable "ec2_instance_type" {
+  type = string
 }
 
