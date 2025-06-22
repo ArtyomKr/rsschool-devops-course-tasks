@@ -40,5 +40,4 @@ module "k3s" {
   public_subnet_ids  = module.networking.public_subnet_ids
   private_subnet_ids = module.networking.private_subnet_ids
   bastion_sg_id      = module.networking.bastion_sg_id
-  allowed_access_ips = var.allowed_access_ips
 }
