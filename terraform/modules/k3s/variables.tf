@@ -27,6 +27,6 @@ variable "ec2_instance_type" {
 }
 
 variable "k3s_agent_count" {
-  type = number
+  type    = number
   default = 2
 }
