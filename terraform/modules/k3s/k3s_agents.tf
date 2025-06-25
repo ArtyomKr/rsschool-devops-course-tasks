@@ -4,8 +4,7 @@ resource "aws_instance" "k3s_agent" {
   instance_type          = var.ec2_instance_type
   subnet_id              = var.private_subnet_ids[count.index % length(var.private_subnet_ids)]
   vpc_security_group_ids = [aws_security_group.k3s.id]
-  # key_name      = var.ssh_key_name
-  iam_instance_profile = var.ec2_iam
+  key_name               = var.instance_key_pair_name
 
   user_data = <<-EOF
     #!/bin/bash

@@ -6,9 +6,12 @@ variable "ec2_iam" {
   type = string
 }
 
-variable "key_pair_name" {
-  type    = string
-  default = "Private-key-tyoma"
+variable "bastion_key_pair_name" {
+  type = string
+}
+
+variable "instance_key_pair_name" {
+  type = string
 }
 
 variable "aws_region" {

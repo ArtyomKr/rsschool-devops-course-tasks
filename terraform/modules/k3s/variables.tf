@@ -18,6 +18,10 @@ variable "bastion_sg_id" {
   type        = string
 }
 
+variable "instance_key_pair_name" {
+  type = string
+}
+
 variable "ec2_iam" {
   type = string
 }

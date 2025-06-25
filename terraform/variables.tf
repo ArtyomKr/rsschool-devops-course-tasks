@@ -29,6 +29,16 @@ variable "allowed_access_ips" {
   default     = ["0.0.0.0/0"]
 }
 
+variable "bastion_key_pair_name" {
+  type    = string
+  default = "Bastion_key_pair"
+}
+
+variable "instance_key_pair_name" {
+  type    = string
+  default = "Instance_key_pair"
+}
+
 variable "git_actions_policies" {
   type = list(string)
   default = [
