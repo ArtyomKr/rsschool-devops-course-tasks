@@ -6,6 +6,7 @@ resource "aws_instance" "k3s_server" {
   key_name               = var.instance_key_pair_name
 
   user_data = <<-EOF
+    #!/bin/bash
     curl -sfL https://get.k3s.io | sh -s - server --cluster-init --token=${random_password.k3s_token.result}
   EOF
 
