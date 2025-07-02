@@ -8,4 +8,6 @@ minikube ssh -- "sudo mkdir -p /data/jenkins-volume && sudo chown -R 1000:1000 /
 kubectl apply -f jenkins-02-sa.yaml
 
 # Install Jenkins via Helm
+helm repo add jenkins https://charts.jenkins.io
+helm repo update
 helm install jenkins -n devops-tools -f jenkins-values.yaml jenkinsci/jenkins
