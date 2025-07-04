@@ -1,3 +1,5 @@
+kubectl create namespace devops-tools
+
 # Create PV and StorageClass
 kubectl apply -f jenkins-01-volume.yaml
 
