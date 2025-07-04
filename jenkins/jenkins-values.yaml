@@ -409,6 +409,7 @@ controller:
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.7.0
     - configuration-as-code:1971.vf9280461ea_89
+    - job-dsl:1.93
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -505,21 +506,26 @@ controller:
   # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin. The lines after each |
   # become the content of the configuration yaml file. The first line after this is a JCasC root element, e.g., jenkins, credentials,
   # etc. Best reference is https://<jenkins_url>/configuration-as-code/reference. The example below creates a welcome message:
+
   JCasC:
     # -- Enables default Jenkins configuration via configuration as code plugin
     defaultConfig: true
-
     # If true, the init container deletes all the plugin config files and Jenkins Config as Code overwrites any existing configuration
     # -- Whether Jenkins Config as Code should overwrite any existing configuration
     overwriteConfiguration: false
     # -- Remote URLs for configuration files.
     configUrls: []
-    # - https://acme.org/jenkins.yaml
     # -- List of Jenkins Config as Code scripts
-    configScripts: {}
-    #  welcome-message: |
-    #    jenkins:
-    #      systemMessage: Welcome to our CI\CD server. This Jenkins is configured and managed 'as code'.
+    configScripts:
+      hello-world-job: |
+        jobs:
+          - script: >
+              freeStyleJob('hello-world') {
+                displayName('Hello World Job')
+                steps {
+                  shell('echo "Hello World!"')
+                }
+              }
 
     # Allows adding to the top-level security JCasC section. For legacy purposes, by default, the chart includes apiToken configurations
     # -- Jenkins Config as Code security-section
