@@ -1,1 +1,1 @@
-minikube service jenkins -n devops-tools
+minikube service jenkins -n jenkins

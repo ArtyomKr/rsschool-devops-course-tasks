@@ -1,18 +1,20 @@
-# Jenkins local config
+# Jenkins custom chart
 
-This Jenkins config can be used to install jenkins with helm on minikube cluster. 
-The JCasC configs are stored in `jenkins-values.yaml` file (`controller/JCasC/configScripts`).
+This chart installs preconfigured jenkins. 
+The JCasC configs are stored in `jenkins/jenkins-chart/values.yaml` file (`controller/JCasC/configScripts`).
 
 ## Running Jenkins
 
 1. Clone the repository.
 2. `cd` into `/jenkins` folder.
 3. Make sure you have [minikube](https://minikube.sigs.k8s.io/) and [helm](https://helm.sh/) installed.
-4. Run `install.sh` file. It should automatically create and configure jenkins from helm in devops-tools namespace.
-5. [Obtain](https://www.jenkins.io/doc/book/installing/kubernetes/#install-jenkins) jenkins admin password. 
-6. To run jenkins in you browser start minikube `minikube start` and then run `start.sh` script.
+4. Create desired namespace: `kubectl create namespace jenkins`.
+5. Install chart: `helm install jenkins ./jenkins-chart -n jenkins`.  
+6. **!Important**: If you use minicude run `minikube ssh -- "sudo mkdir -p /data/jenkins-volume && sudo chown -R 1000:1000 /data/jenkins-volume"` to set correct permissions after installing the chart.
+7. Obtain jenkins admin password: `kubectl get secret -n jenkins jenkins -o jsonpath="{.data.jenkins-admin-password}" | base64 -d`
+8. To run jenkins in you browser start minikube `minikube start` and then run `start.sh` script.
 
 To apply new JCasC config script:
 
-1. Modify `jenkins-values.yaml` file.
-2. Run `helm upgrade jenkins jenkinsci/jenkins -n devops-tools -f jenkins-values.yaml`.
+1. Modify `values.yaml` file.
+2. Run `helm upgrade jenkins ./jenkins-chart -n jenkins`.
