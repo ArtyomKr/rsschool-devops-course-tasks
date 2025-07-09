@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: python
-  tag: 3.9
+  repository: artyomkr/flask-app
+  tag: "1.0"
   pullPolicy: IfNotPresent
 
 service:
