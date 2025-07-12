@@ -2,8 +2,12 @@ name: Terraform
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'terraform/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'terraform/**'
 
 jobs:
   terraform-check:
@@ -62,8 +66,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-           role-to-assume: arn:aws:iam::049886442714:role/GithubActionsRole
-           aws-region: eu-central-1
+          role-to-assume: arn:aws:iam::049886442714:role/GithubActionsRole
+          aws-region: eu-central-1
 
       - name: Terraform Init
         working-directory: ./terraform
