@@ -28,10 +28,11 @@ pipeline {
         }
     }
     environment {
-        FLASK_APP_DIR = "docker/flask-app/app/"
+        FLASK_APP_DIR = "docker/flask-app/"
+        DOCKER_IMAGE_TAG = "artyomkr/flask-app:latest"
     }
     stages {
-        stage('Build') {
+        stage('Build app') {
             steps {
                 container('python') {
                     dir(FLASK_APP_DIR) {
@@ -45,6 +46,16 @@ pipeline {
                 container('python') {
                     dir(FLASK_APP_DIR) {
                         sh 'python -m unittest discover -s tests'
+                    }
+                }
+            }
+        }
+        stage('Build and push docker image') {
+            steps {
+                container('docker') {
+                    dir(FLASK_APP_DIR) {
+                        sh 'docker build . -t ${DOCKER_IMAGE_TAG}'
+                        sh 'docker push ${DOCKER_IMAGE_TAG}'
                     }
                 }
             }
