@@ -13,9 +13,6 @@ pipeline {
                 image: python:3.9-slim
                 command: ["cat"]
                 tty: true
-                volumeMounts:
-                - name: workspace
-                  mountPath: /home/jenkins/agent
               - name: docker
                 image: docker:latest
                 command: ["cat"]
@@ -23,14 +20,10 @@ pipeline {
                 volumeMounts:
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
-                - name: workspace
-                  mountPath: /home/jenkins/agent
               volumes:
               - name: docker-sock
                 hostPath:
                   path: /var/run/docker.sock
-              - name: workspace
-                emptyDir: {}
             '''
         }
     }
@@ -38,13 +31,6 @@ pipeline {
         FLASK_APP_DIR = "docker/flask-app/app/"
     }
     stages {
-        stage('Verify Setup') {
-            steps {
-                container('python') {
-                    sh 'python --version'
-                }
-            }
-        }
         stage('Build') {
             steps {
                 container('python') {
