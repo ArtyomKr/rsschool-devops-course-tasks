@@ -46,7 +46,7 @@ pipeline {
         stage('Verify Setup') {
             steps {
                 container('python') {
-                    sh 'ls -la'
+                    sh 'python --version'                
                 }
             }
         }
