@@ -43,6 +43,19 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Verify Setup') {
+            steps {
+                container('python') {
+                    sh '''
+                        echo "Current directory: $(pwd)"
+                        ls -la
+                        ls -la ${FLASK_APP_DIR}
+                        python --version
+                        pip --version
+                    '''
+                }
+            }
+        }
         stage('Build') {
             steps {
                 container('python') {
