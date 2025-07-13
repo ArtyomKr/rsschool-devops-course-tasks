@@ -46,13 +46,7 @@ pipeline {
         stage('Verify Setup') {
             steps {
                 container('python') {
-                    sh '''
-                        echo "Current directory: $(pwd)"
-                        ls -la
-                        ls -la ${FLASK_APP_DIR}
-                        python --version
-                        pip --version
-                    '''
+                    sh 'ls -la'
                 }
             }
         }
