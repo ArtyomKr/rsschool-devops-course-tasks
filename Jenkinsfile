@@ -3,33 +3,39 @@ pipeline {
         pollSCM('* * * * *')
     }
     agent {
-            docker {
-                image 'python:3.9-slim'
-                args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
-            }
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: python
+                image: python:3.9-slim
+                command: ["cat"]
+                tty: true
+              - name: docker
+                image: docker:latest
+                command: ["cat"]
+                tty: true
+                volumeMounts:
+                - name: docker-sock
+                  mountPath: /var/run/docker.sock
+              volumes:
+              - name: docker-sock
+                hostPath:
+                  path: /var/run/docker.sock
+            '''
         }
+    }
     stages {
-        stage('Checkout') {
+        stage('Run in K8s Pod') {
             steps {
-                checkout scm
-            }
-        }
-        stage('Check Tools') {
-            steps {
-                sh 'python --version'
-                sh 'docker --version'
-            }
-        }
-        stage('Build') {
-            steps {
-                echo 'Building...'
-                sh 'make build'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh 'make test'
+                container('python') {
+                    sh 'python --version'
+                }
+                container('docker') {
+                    sh 'docker --version'
+                }
             }
         }
     }
