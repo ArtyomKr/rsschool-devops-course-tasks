@@ -20,6 +20,10 @@ pipeline {
                 volumeMounts:
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
+              - name: helm
+                image: alpine/helm:3.12.0
+                command: ["cat"]
+                tty: true
               volumes:
               - name: docker-sock
                 hostPath:
@@ -30,6 +34,9 @@ pipeline {
     environment {
         FLASK_APP_DIR = "docker/flask-app/"
         DOCKER_IMAGE_TAG = "artyomkr/flask-app:latest"
+        HELM_CHART_DIR = "helm/flask-app/"
+        APP_CLUSTER_NAMESPACE = "default"
+        HELM_RELEASE_NAME = "flask-app"
     }
     stages {
         stage('Build app') {
@@ -54,8 +61,31 @@ pipeline {
             steps {
                 container('docker') {
                     dir(FLASK_APP_DIR) {
-                        sh 'docker build . -t ${DOCKER_IMAGE_TAG}'
-                        sh 'docker push ${DOCKER_IMAGE_TAG}'
+                        withCredentials([usernamePassword(
+                            credentialsId: 'docker-hub-creds',
+                            usernameVariable: 'DOCKER_USERNAME',
+                            passwordVariable: 'DOCKER_PASSWORD'
+                        )]) {
+                            sh '''
+                                docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+                                docker build . -t ${DOCKER_IMAGE_TAG}
+                                docker push ${DOCKER_IMAGE_TAG}
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+        stage('Deploy with Helm') {
+            steps {
+                container('helm') {
+                    dir(HELM_CHART_DIR) {
+                        sh '''
+                            helm upgrade --install ${HELM_RELEASE_NAME} . \
+                                --namespace ${APP_CLUSTER_NAMESPACE} \
+                                --atomic \
+                                --wait
+                        '''
                     }
                 }
             }
