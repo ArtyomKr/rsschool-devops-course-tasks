@@ -38,15 +38,10 @@ pipeline {
         FLASK_APP_DIR = "docker/flask-app/app/"
     }
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Verify Setup') {
             steps {
                 container('python') {
-                    sh 'python --version'                
+                    sh 'python --version'
                 }
             }
         }
