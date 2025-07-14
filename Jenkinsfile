@@ -156,7 +156,18 @@ pipeline {
             echo 'Pipeline succeeded!'
         }
         failure {
-            echo 'Pipeline failed!'
+             mail (
+                subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                ❌ Build Failed!
+
+                Build Details:
+                - Branch: ${env.GIT_BRANCH}
+                - Commit: ${env.GIT_COMMIT}
+                - Failed Stage: ${env.STAGE_NAME}
+                """,
+                to: 'tyomik.krasnitsky@gmail.com',
+             )
         }
     }
 }
