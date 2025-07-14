@@ -28,7 +28,7 @@ helm repo update
 
 helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube \
   --create-namespace
-  --set edition=developer \
+  --set community.enabled=true \
   --set persistence.enabled=true \
   --set postgresql.enabled=true \
   --set service.type=NodePort \
