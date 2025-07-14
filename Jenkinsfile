@@ -2,7 +2,7 @@ pipeline {
     parameters {
         booleanParam(
             name: 'MANUAL_DOCKER_PUSH',
-            defaultValue: false,
+            defaultValue: true,
             description: 'Check to manually trigger Docker build/push'
         )
     }
@@ -83,11 +83,7 @@ pipeline {
             }
         }
         stage('Build and push docker image') {
-            when {
-                expression {
-                    return params.MANUAL_DOCKER_PUSH == true
-                }
-            }
+            when { expression { params.MANUAL_DOCKER_PUSH == true } }
             steps {
                 container('docker') {
                     dir(FLASK_APP_DIR) {
@@ -102,14 +98,15 @@ pipeline {
                                 docker push ${DOCKER_IMAGE_TAG}
                             '''
                         }
+                        script {
+                            env.DOCKER_PUSH_SUCCEEDED = "true"
+                        }
                     }
                 }
             }
         }
         stage('Deploy with Helm') {
-            when {
-                expression { previousStageResult() == 'SUCCESS' }
-            }
+            when { expression { env.DOCKER_PUSH_SUCCEEDED == "true" } }
             steps {
                 container('helm') {
                     dir(HELM_CHART_DIR) {
