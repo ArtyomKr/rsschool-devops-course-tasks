@@ -20,6 +20,10 @@ pipeline {
                 volumeMounts:
                 - name: docker-sock
                   mountPath: /var/run/docker.sock
+              - name: sonarscanner
+                image: sonarsource/sonar-scanner-cli:latest
+                command: ["cat"]
+                tty: true
               - name: helm
                 image: alpine/helm:3.12.0
                 command: ["cat"]
@@ -37,6 +41,7 @@ pipeline {
         HELM_CHART_DIR = "helm/flask-app/"
         APP_CLUSTER_NAMESPACE = "default"
         HELM_RELEASE_NAME = "flask-app"
+        SONARQUBE_SERVER = "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
     }
     stages {
         stage('Build app') {
@@ -72,6 +77,21 @@ pipeline {
                                 docker push ${DOCKER_IMAGE_TAG}
                             '''
                         }
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                container('sonarscanner') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=flask-app \
+                            -Dsonar.sources=${FLASK_APP_DIR} \
+                            -Dsonar.python.version=3.9
+                        """
                     }
                 }
             }

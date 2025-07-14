@@ -19,3 +19,20 @@ To change docker image of the app:
 3. Build image with `docker build . -t yourname/flask-app:1.0`.
 4. Push your image with `docker push yourname/flask-app:1.0`.
 5. Modify helm chart's `values.yaml` to use you image.
+
+## Installing SonarQube
+
+```
+helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
+helm repo update
+
+helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube \
+  --create-namespace
+  --set edition=developer \
+  --set persistence.enabled=true \
+  --set postgresql.enabled=true \
+  --set service.type=NodePort \
+  --set monitoringPasscode=<YOUR PASS>
+```
+
+To access SonarQube server dashboard run `minikube service sonarqube-sonarqube -n sonarqube`

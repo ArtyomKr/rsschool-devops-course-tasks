@@ -398,6 +398,7 @@ jenkins:
       - git:5.7.0
       - configuration-as-code:1971.vf9280461ea_89
       - job-dsl:1.93
+      - sonarqube-scanner:2.18
 
     # If set to false, Jenkins will download the minimum required version of all dependencies.
     # -- Download the minimum required version or latest version of all dependencies
