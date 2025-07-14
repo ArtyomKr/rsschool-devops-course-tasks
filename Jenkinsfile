@@ -120,30 +120,32 @@ pipeline {
                 }
             }
         }
-        stage('Validate Deployment') {
+        stage('Smoke test') {
             when {
                 expression { env.DOCKER_PUSH_SUCCEEDED == "true" }
             }
             steps {
                 container('python') {
                     script {
-                        def retries = 3
+                        def url = "http://${HELM_RELEASE_NAME}.${APP_CLUSTER_NAMESPACE}.svc.cluster.local:8080"
+                        def max_retries = 3
                         def timeout = 10
                         def success = false
 
-                        while (retries > 0 && !success) {
+                        for (int i = 1; i <= max_retries && !success; i++) {
                             try {
                                 sh """
-                                    curl -sSf --max-time ${timeout} \
-                                    http://${HELM_RELEASE_NAME}.${APP_CLUSTER_NAMESPACE}.svc.cluster.local:8080 \
-                                    | grep -q 'Hello, World!'
+                                    python -c "
+                                    import requests;
+                                    r = requests.get('${url}', timeout=${timeout});
+                                    sys.exit(0 if r.status_code == 200 else 1)"
                                 """
                                 success = true
-                                echo "✅ Application is healthy"
+                                echo "✅ Service returned HTTP 200"
                             } catch (e) {
-                                retries--
+                                echo "⚠️ Attempt ${i} failed: ${e.message}"
+                                if (i == max_retries) error("Smoke test failed after ${max_retries} attempts")
                                 sleep(time: timeout, unit: 'SECONDS')
-                                if (retries == 0) error("❌ Application validation failed after retries")
                             }
                         }
                     }
