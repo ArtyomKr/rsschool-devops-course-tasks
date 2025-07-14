@@ -120,6 +120,36 @@ pipeline {
                 }
             }
         }
+        stage('Validate Deployment') {
+            when {
+                expression { env.DOCKER_PUSH_SUCCEEDED == "true" }
+            }
+            steps {
+                container('python') {
+                    script {
+                        def retries = 3
+                        def timeout = 10
+                        def success = false
+
+                        while (retries > 0 && !success) {
+                            try {
+                                sh """
+                                    curl -sSf --max-time ${timeout} \
+                                    http://${HELM_RELEASE_NAME}.${APP_CLUSTER_NAMESPACE}.svc.cluster.local:8080 \
+                                    | grep -q 'Hello, World!'
+                                """
+                                success = true
+                                echo "✅ Application is healthy"
+                            } catch (e) {
+                                retries--
+                                sleep(time: timeout, unit: 'SECONDS')
+                                if (retries == 0) error("❌ Application validation failed after retries")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
         success {
