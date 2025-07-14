@@ -134,12 +134,10 @@ pipeline {
 
                         for (int i = 1; i <= max_retries && !success; i++) {
                             try {
-                                sh """
-                                    python -c "
-                                    import requests;
-                                    r = requests.get('${url}', timeout=${timeout});
-                                    sys.exit(0 if r.status_code == 200 else 1)"
-                                """
+                                sh '''
+                                    pip install requests --quiet && \
+                                    python -c "import requests,sys;r=requests.get('${url}',timeout=${timeout});sys.exit(0 if r.status_code==200 else 1)"
+                                '''
                                 success = true
                                 echo "✅ Service returned HTTP 200"
                             } catch (e) {
