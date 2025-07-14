@@ -1,4 +1,11 @@
 pipeline {
+    parameters {
+        booleanParam(
+            name: 'MANUAL_DOCKER_PUSH',
+            defaultValue: false,
+            description: 'Check to manually trigger Docker build/push'
+        )
+    }
     triggers {
         pollSCM('* * * * *')
     }
@@ -41,7 +48,6 @@ pipeline {
         HELM_CHART_DIR = "helm/flask-app/"
         APP_CLUSTER_NAMESPACE = "default"
         HELM_RELEASE_NAME = "flask-app"
-        SONARQUBE_SERVER = "http://sonarqube-sonarqube.sonarqube.svc.cluster.local:9000"
     }
     stages {
         stage('Build app') {
@@ -62,7 +68,26 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                container('sonarscanner') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh """
+                        sonar-scanner \
+                            -Dsonar.projectKey=flask-app \
+                            -Dsonar.sources=${FLASK_APP_DIR} \
+                            -Dsonar.python.version=3.9
+                        """
+                    }
+                }
+            }
+        }
         stage('Build and push docker image') {
+            when {
+                expression {
+                    return params.MANUAL_DOCKER_PUSH == true
+                }
+            }
             steps {
                 container('docker') {
                     dir(FLASK_APP_DIR) {
@@ -81,22 +106,10 @@ pipeline {
                 }
             }
         }
-
-        stage('SonarQube Analysis') {
-            steps {
-                container('sonarscanner') {
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                        sonar-scanner \
-                            -Dsonar.projectKey=flask-app \
-                            -Dsonar.sources=${FLASK_APP_DIR} \
-                            -Dsonar.python.version=3.9
-                        """
-                    }
-                }
-            }
-        }
         stage('Deploy with Helm') {
+            when {
+                expression { previousStageResult() == 'SUCCESS' }
+            }
             steps {
                 container('helm') {
                     dir(HELM_CHART_DIR) {
