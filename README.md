@@ -25,3 +25,28 @@ The IAM role and S3 Bucket for terraform state should be created **before** runn
 3. Run `terraform init`.
 4. Make changes to terraform configuration.
 5. Run `terraform apply`
+
+
+# Terraform AWS k3s cluster setup
+
+This Terraform configuration sets up a k3s cluster using AWS infrastructure.
+
+It consists of 1 server and 2 (you can change their number in variables) agents.
+
+## Resources Created
+
+### 1. K3s server
+
+### 2. K3s agents (2)
+
+### 3. Security group for k3s cluster
+
+## Usage locally
+
+1. Clone the repository.
+2. `cd` into `/terraform` folder.
+3. Run `terraform init`.
+4. Make changes to terraform configuration.
+5. Run `terraform apply`
+6. Connect with ssh to bastion host, use ssh agent to forward the k3s server key.
+7. Connect to k3s server to run `kubectl` commands.

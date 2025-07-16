@@ -1,12 +1,11 @@
 resource "aws_instance" "nat" {
   ami                         = var.ec2_iam
-  instance_type               = "t2.micro"
-  subnet_id                   = aws_subnet.public_1a.id
+  instance_type               = var.ec2_instance_type
+  subnet_id                   = aws_subnet.public["1a"].id
   associate_public_ip_address = true
   source_dest_check           = false
   vpc_security_group_ids      = [aws_security_group.nat.id]
-  key_name                    = var.key_pair_name
-
+  key_name                    = var.instance_key_pair_name
 
   user_data = <<-EOF
     #!/bin/bash

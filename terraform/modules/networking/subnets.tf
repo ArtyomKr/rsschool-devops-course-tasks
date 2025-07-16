@@ -1,41 +1,35 @@
-resource "aws_subnet" "public_1a" {
+locals {
+  public_subnets = {
+    "1a" = { cidr = "10.0.0.0/24", az = "${var.aws_region}a" },
+    "1b" = { cidr = "10.0.1.0/24", az = "${var.aws_region}b" }
+  }
+  private_subnets = {
+    "1a" = { cidr = "10.0.2.0/24", az = "${var.aws_region}a" },
+    "1b" = { cidr = "10.0.3.0/24", az = "${var.aws_region}b" }
+  }
+}
+
+resource "aws_subnet" "public" {
+  for_each = local.public_subnets
+
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.0.0/24"
-  availability_zone       = "eu-central-1a"
+  cidr_block              = each.value.cidr
+  availability_zone       = each.value.az
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "Public Subnet 1a"
+    Name = "Public Subnet ${each.key}"
   }
 }
 
-resource "aws_subnet" "public_1b" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "eu-central-1b"
-  map_public_ip_on_launch = true
+resource "aws_subnet" "private" {
+  for_each = local.private_subnets
 
-  tags = {
-    Name = "Public Subnet 1b"
-  }
-}
-
-resource "aws_subnet" "private_1a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "eu-central-1a"
+  cidr_block        = each.value.cidr
+  availability_zone = each.value.az
 
   tags = {
-    Name = "Private Subnet 1a"
-  }
-}
-
-resource "aws_subnet" "private_1b" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "eu-central-1b"
-
-  tags = {
-    Name = "Private Subnet 1b"
+    Name = "Private Subnet ${each.key}"
   }
 }
