@@ -41,14 +41,14 @@ The IAM role and S3 Bucket for terraform state should be created **before** runn
 ## Usage locally
 
 1. Clone the repository.
-2. Cd into `/terraform` folder.
+2. `cd` into `/terraform` folder.
 3. Run `terraform init`.
 4. Make changes to terraform configuration.
-5. Run `terraform apply` (make sure backend bucket is created, you can use terraform config in `/backend` folder to create it)
+5. Run `terraform apply` (make sure the backend bucket is created, you can use terraform config in `/backend` folder to create it)
 
 ## Usage in GitHub Actions
 
-To use this infrastructure in GitHub Actions workflows:
+To use a **GithubActionsRole** role in GitHub Actions workflows:
 
 ```yaml
 jobs:
