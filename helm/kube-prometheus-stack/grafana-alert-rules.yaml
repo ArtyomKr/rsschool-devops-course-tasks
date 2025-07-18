@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-alert-rules
+  namespace: monitoring
+  labels:
+    grafana_alert: "1"
+data:
+  cluster-alerts.yaml: |-
+    apiVersion: 1
+
+    groups:
+      - name: cluster-monitoring-alerts
+        folder: "Cluster Monitoring"
+        interval: 1m
+        rules:
+          - uid: high-cpu-utilization
+            title: "High CPU Utilization"
+            condition: "A"
+            no_data_state: "Alerting"
+            exec_err_state: "Alerting"
+            for: "5m"
+            annotations:
+              summary: "High CPU usage on {{ $labels.instance }}"
+              description: "CPU usage is {{ $value }}% (threshold: 80%)"
+            labels:
+              severity: "warning"
+            notification_settings:
+              receiver: "email admin"
+              group_by: ["..."]
+              group_wait: "30s"
+              group_interval: "5m"
+              repeat_interval: "4h"
+            data:
+              - refId: "A"
+                datasourceUid: "prometheus"
+                queryType: "range"
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  expr: '100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80'
+                  refId: "A"
+                  exemplar: false
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  editorMode: "code"
+
+          - uid: low-available-memory
+            title: "Low Available Memory"
+            condition: "A"
+            no_data_state: "Alerting"
+            exec_err_state: "Alerting"
+            for: "5m"
+            annotations:
+              summary: "Low available memory on {{ $labels.instance }}"
+              description: "Available memory is only {{ $value }} bytes"
+            labels:
+              severity: "warning"
+            notification_settings:
+              receiver: "email admin"
+              group_by: ["..."]
+              group_wait: "30s"
+              group_interval: "5m"
+              repeat_interval: "4h"
+            data:
+              - refId: "A"
+                datasourceUid: "prometheus"
+                queryType: "range"
+                relativeTimeRange:
+                  from: 600
+                  to: 0
+                model:
+                  expr: 'node_memory_MemAvailable_bytes < 1073741824'
+                  refId: "A"
+                  exemplar: false
+                  intervalMs: 1000
+                  maxDataPoints: 43200
+                  editorMode: "code"
