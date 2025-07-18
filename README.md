@@ -14,19 +14,13 @@ This pipeline involves polling Git, building and testing the app, scanning it wi
 7. Jenkins check for updates in git repo every minute, so deploy will trigger within a minute after new pushes.
 
 
-## Installing SonarQube
+## Installing Prometheus
 
 ```
-helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-helm upgrade --install -n sonarqube sonarqube sonarqube/sonarqube \
-  --create-namespace
-  --set community.enabled=true \
-  --set persistence.enabled=true \
-  --set postgresql.enabled=true \
-  --set service.type=NodePort \
-  --set monitoringPasscode=<YOUR PASS>
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f .\helm\kube-prometheus-stack\values.yaml --create-namespace
 ```
 
 To access SonarQube server dashboard run `minikube service sonarqube-sonarqube -n sonarqube`
