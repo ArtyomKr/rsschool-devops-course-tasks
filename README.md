@@ -1,18 +1,17 @@
-# Jenkins pipeline
+# Prometheus Deployment on K8s
 
-This pipeline involves polling Git, building and testing the app, scanning it with SonarQube, building and pushing docker image and deploying helm chart. 
+This prometheus and grafana setup can be installed with helm and has custom dashboards, alert rules and smtp config.
 
-# Pipeline requirements:
+## Create config maps for grafana:
 
-1. Make sure you have a working jenkins installation with GitHub and SonarQube plugins.
-2. Set up repository and branch for SCM polling with GitHub plugin (using Jenkins UI).
-3. Install SonarQube Server.
-4. Set up credentials in Jenkins for docker hub (or other provider). In my case credentials are named `docker-hub-creds`.
-5. Set up SonarQube integration by creating token in SonarQube, adding it to credentials in Jenkins and adding SonarQube server in global settings .
-6. For email notifications you can use [Google SMTP server](https://support.google.com/a/answer/176600?hl=en). You can configure SMTP server in global Jenkins server.
-**Keep in mind, if you are running Jenkins locally, that some antiviruses can block SMTP connection.**
-7. Jenkins check for updates in git repo every minute, so deploy will trigger within a minute after new pushes.
+```
+kubectl create namespace monitoring
 
+kubectl apply -f ./helm/kube-prometheus-stack/grafana-contact-points.yaml \
+              -f ./helm/kube-prometheus-stack/grafana-alert-rules.yaml \
+              -f ./helm/kube-prometheus-stack/grafana-dashboards.yaml \
+              -n monitoring
+```
 
 ## Installing Prometheus
 
@@ -23,4 +22,8 @@ helm repo update
 helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f .\helm\kube-prometheus-stack\values.yaml --create-namespace
 ```
 
-To access SonarQube server dashboard run `minikube service sonarqube-sonarqube -n sonarqube`
+## Jenkins pipeline requirements:
+
+1. Add admin cluster role to jenkins: `kubectl create clusterrolebinding jenkins-admin --clusterrole=cluster-admin --serviceaccount=jenkins:default`.
+2. Push code to GitHub repo.
+3. Jenkins checks for updates in git repo every hour, so deploy will trigger within an hour after new pushes.
