@@ -1,21 +1,29 @@
-# Flask custom chart
+# Prometheus Deployment on K8s
 
-This chart installs custom flask chart. 
+This prometheus and grafana setup can be installed with helm and has custom dashboards, alert rules and smtp config.
 
-## Running Jenkins
+## Create config maps for grafana:
 
-1. Clone the repository.
-2. `cd` into `/helm` folder.
-3. Make sure you have [minikube](https://minikube.sigs.k8s.io/) and [helm](https://helm.sh/) installed.
-4. Create desired namespace: `kubectl create namespace flask-app`.
-5.  Install chart dependencies: `helm dependency build ./jenkins-chart`.
-6. Install chart: `helm install flask-app ./flask-app -n flask-app`.  
-7. To run the app in you browser start minikube `minikube start` and then run `minikube service flask-app -n flask-app`.
+```
+kubectl create namespace monitoring
 
-To change docker image of the app:
+kubectl apply -f ./helm/kube-prometheus-stack/grafana-contact-points.yaml \
+              -f ./helm/kube-prometheus-stack/grafana-alert-rules.yaml \
+              -f ./helm/kube-prometheus-stack/grafana-dashboards.yaml \
+              -n monitoring
+```
 
-1. `cd` into `/docker` folder.
-2. Modify `Dockerfile`.
-3. Build image with `docker build . -t yourname/flask-app:1.0`.
-4. Push your image with `docker push yourname/flask-app:1.0`.
-5. Modify helm chart's `values.yaml` to use you image.
+## Installing Prometheus
+
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring -f .\helm\kube-prometheus-stack\values.yaml --create-namespace
+```
+
+## Jenkins pipeline requirements:
+
+1. Add admin cluster role to jenkins: `kubectl create clusterrolebinding jenkins-admin --clusterrole=cluster-admin --serviceaccount=jenkins:default`.
+2. Push code to GitHub repo.
+3. Jenkins checks for updates in git repo every hour, so deploy will trigger within an hour after new pushes.

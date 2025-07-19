@@ -1,0 +1,63 @@
+pipeline {
+    triggers {
+        pollSCM('H * * * *')
+    }
+    agent {
+        kubernetes {
+            yaml '''
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: kubectl
+                image: alpine/k8s:1.30.14
+                command: ["sleep", "infinity"]
+            '''
+        }
+    }
+    environment {
+        PROMETHEUS_CHART_NAME = "kube-prometheus-stack"
+        PROMETHEUS_CLUSTER_NAMESPACE = "monitoring"
+        CONFIG_DIR = "./helm/kube-prometheus-stack"
+    }
+    stages {
+            stage('Apply Grafana Configurations') {
+                steps {
+                     container('kubectl') {
+                         sh '''
+                            kubectl create namespace ${PROMETHEUS_CLUSTER_NAMESPACE} || true
+                            kubectl apply -f ${CONFIG_DIR}/grafana-contact-points.yaml \
+                                          -f ${CONFIG_DIR}/grafana-alert-rules.yaml \
+                                          -f ${CONFIG_DIR}/grafana-dashboards.yaml \
+                                          -n ${PROMETHEUS_CLUSTER_NAMESPACE}
+                        '''
+                     }
+                }
+            }
+
+            stage('Deploy Prometheus Stack') {
+                steps {
+                    container('kubectl') {
+                        sh '''
+                            helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                            helm repo update
+                            helm upgrade --install prometheus prometheus-community/${PROMETHEUS_CHART_NAME} \
+                                -n ${PROMETHEUS_CLUSTER_NAMESPACE} \
+                                -f ${CONFIG_DIR}/values.yaml \
+                                --create-namespace \
+                                --atomic \
+                                --wait
+                        '''
+                    }
+                }
+            }
+        }
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
