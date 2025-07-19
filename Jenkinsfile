@@ -30,6 +30,7 @@ pipeline {
                 steps {
                     container('kubectl') {
                         sh '''
+                            kubectl create namespace ${PROMETHEUS_CLUSTER_NAMESPACE}
                             kubectl apply -f ${CONFIG_DIR}/grafana-contact-points.yaml \
                                           -f ${CONFIG_DIR}/grafana-alert-rules.yaml \
                                           -f ${CONFIG_DIR}/grafana-dashboards.yaml \
