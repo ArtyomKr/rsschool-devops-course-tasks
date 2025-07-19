@@ -9,10 +9,9 @@ pipeline {
             kind: Pod
             spec:
               containers:
-              - name: helm
-                image: alpine/helm:3.12.0
               - name: kubectl
-                image: bitnami/kubectl:latest
+                image: alpine/k8s:1.30.14
+                command: ["sleep", "infinity"]
             '''
         }
     }
@@ -24,21 +23,21 @@ pipeline {
     stages {
             stage('Apply Grafana Configurations') {
                 steps {
-                    container('kubectl') {
-                        sh '''
-                            kubectl create namespace ${PROMETHEUS_CLUSTER_NAMESPACE}
+                     container('kubectl') {
+                         sh '''
+                            kubectl create namespace ${PROMETHEUS_CLUSTER_NAMESPACE} || true
                             kubectl apply -f ${CONFIG_DIR}/grafana-contact-points.yaml \
                                           -f ${CONFIG_DIR}/grafana-alert-rules.yaml \
                                           -f ${CONFIG_DIR}/grafana-dashboards.yaml \
                                           -n ${PROMETHEUS_CLUSTER_NAMESPACE}
                         '''
-                    }
+                     }
                 }
             }
 
             stage('Deploy Prometheus Stack') {
                 steps {
-                    container('helm') {
+                    container('kubectl') {
                         sh '''
                             helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
                             helm repo update
