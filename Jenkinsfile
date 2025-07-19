@@ -1,6 +1,6 @@
 pipeline {
     triggers {
-        pollSCM(' * * * *')
+        pollSCM('H * * * *')
     }
     agent {
         kubernetes {
@@ -13,8 +13,6 @@ pipeline {
                 image: alpine/helm:3.12.0
               - name: kubectl
                 image: bitnami/kubectl:latest
-                command: ["cat"]
-                tty: true
             '''
         }
     }
