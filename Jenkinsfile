@@ -13,6 +13,10 @@ pipeline {
                 image: alpine/helm:3.12.0
                 command: ["cat"]
                 tty: true
+              - name: kubectl
+                image: bitnami/kubectl:latest
+                command: ["cat"]
+                tty: true
             '''
         }
     }
@@ -24,7 +28,7 @@ pipeline {
     stages {
             stage('Apply Grafana Configurations') {
                 steps {
-                    container('helm') {
+                    container('kubectl') {
                         sh '''
                             kubectl apply -f ${CONFIG_DIR}/grafana-contact-points.yaml \
                                           -f ${CONFIG_DIR}/grafana-alert-rules.yaml \
